@@ -73,3 +73,4 @@ def get_mongo_status():
         except Exception as e:
             return {'connected': False, 'type': 'Offline / Error', 'error': str(e)}
     return {'connected': False, 'type': 'Local Logging Fallback (MONGODB_URI not set)'}
+

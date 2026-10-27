@@ -250,3 +250,4 @@ def query_assistant(user_message, session_id='guest', user=None):
         'can_create_ticket': True,
         'ticket_subject': msg_clean[:60] if len(msg_clean) > 5 else "Engineering Hub Technical Inquiry"
     }
+

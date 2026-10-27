@@ -35,3 +35,4 @@ urlpatterns = [
     path('api/assistant/', views.assistant_api, name='assistant_api'),
     path('api/feedback/', views.feedback_api, name='feedback_api'),
 ]
+

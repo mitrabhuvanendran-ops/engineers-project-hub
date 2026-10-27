@@ -33,3 +33,4 @@ class RequestLoggingMiddleware:
                 pass
 
         return response
+
