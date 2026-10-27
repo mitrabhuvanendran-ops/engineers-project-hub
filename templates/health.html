@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}System Health &bull; Engineer's Project Hub{% endblock %}
+{% block header_title %}System Health & Telemetry Diagnostics{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Top Banner -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+      <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+        All Core Services Operational
+      </span>
+    </div>
+    <h2 class="text-xl font-bold text-slate-900 tracking-tight">System Health & Request Telemetry</h2>
+    <p class="text-xs sm:text-sm text-slate-500 mt-1">
+      Real-time HTTP request logging, dual-database status monitoring, and 3rd-party environmental API with time limit and fallback.
+    </p>
+  </div>
+
+  <!-- Service Status Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Primary SQL DB -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-500 uppercase">Primary SQL Database</span>
+        <i data-lucide="database" class="w-4 h-4 text-blue-600"></i>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span class="font-bold text-slate-900 text-sm">Online & Active</span>
+      </div>
+      <p class="text-[11px] text-slate-400">Stores Users, Projects, Notes, Calculations, FAQs & Support Tickets</p>
+    </div>
+
+    <!-- MongoDB Atlas -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-500 uppercase">MongoDB NoSQL Logging</span>
+        <i data-lucide="server" class="w-4 h-4 text-emerald-600"></i>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full {% if mongo_status.connected %}bg-emerald-500{% else %}bg-amber-500{% endif %}"></span>
+        <span class="font-bold text-slate-900 text-sm">{{ mongo_status.type }}</span>
+      </div>
+      <p class="text-[11px] text-slate-400">Stores AI chat interaction logs and user satisfaction ratings</p>
+    </div>
+
+    <!-- Total Requests Logged -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-500 uppercase">Total Requests Tracked</span>
+        <i data-lucide="activity" class="w-4 h-4 text-indigo-600"></i>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-2xl font-bold font-mono text-slate-900">{{ total_logs }}</span>
+        <span class="text-xs text-slate-400">HTTP queries</span>
+      </div>
+      <p class="text-[11px] text-slate-400">Monitored via Django RequestLoggingMiddleware</p>
+    </div>
+  </div>
+
+  <!-- Third-Party API with Time Limit & Fallback -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="cloud-rain" class="w-4 h-4 text-blue-600"></i>
+          <h3 class="font-bold text-slate-900 text-sm">3rd-Party Environmental Telemetry API</h3>
+        </div>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Queries Open-Meteo external service with a strict 2.5s timeout. Automatic ISO 2533 Standard Atmosphere fallback.
+        </p>
+      </div>
+      <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold {% if telemetry.is_fallback %}bg-amber-50 text-amber-800 border border-amber-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">
+        {% if telemetry.is_fallback %}Fallback Active (Timeout){% else %}Live Open-Meteo Telemetry{% endif %}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="p-3 bg-slate-50 rounded-xl">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold">Ambient Temperature</span>
+        <p class="text-lg font-bold font-mono text-slate-800 mt-0.5">{{ telemetry.temperature_celsius }} &deg;C</p>
+      </div>
+      <div class="p-3 bg-slate-50 rounded-xl">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold">Relative Humidity</span>
+        <p class="text-lg font-bold font-mono text-slate-800 mt-0.5">{{ telemetry.humidity_pct }} %</p>
+      </div>
+      <div class="p-3 bg-slate-50 rounded-xl">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold">Barometric Pressure</span>
+        <p class="text-lg font-bold font-mono text-slate-800 mt-0.5">{{ telemetry.pressure_hpa }} hPa</p>
+      </div>
+      <div class="p-3 bg-slate-50 rounded-xl">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold">Wind Velocity</span>
+        <p class="text-lg font-bold font-mono text-slate-800 mt-0.5">{{ telemetry.wind_speed_kmh }} km/h</p>
+      </div>
+    </div>
+    <p class="text-[11px] text-slate-400 font-mono">{{ telemetry.note }} (Timestamp: {{ telemetry.timestamp }})</p>
+  </div>
+
+  <!-- Request Logging Table -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+        <i data-lucide="list" class="w-4 h-4 text-blue-600"></i>
+        <span>Recent Server Request Logs (Last 25 Events)</span>
+      </h3>
+      <span class="text-xs text-slate-400 font-mono">Live In-Flight Telemetry</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+          <tr>
+            <th class="py-2.5 px-3">Method</th>
+            <th class="py-2.5 px-3">Path</th>
+            <th class="py-2.5 px-3">Status</th>
+            <th class="py-2.5 px-3">Duration</th>
+            <th class="py-2.5 px-3">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-mono">
+          {% for log in recent_logs %}
+          <tr class="hover:bg-slate-50/60">
+            <td class="py-2 px-3 font-bold text-blue-600">{{ log.method }}</td>
+            <td class="py-2 px-3 text-slate-800">{{ log.path }}</td>
+            <td class="py-2 px-3">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold {% if log.status_code < 300 %}bg-emerald-100 text-emerald-800{% elif log.status_code < 400 %}bg-blue-100 text-blue-800{% elif log.status_code < 500 %}bg-amber-100 text-amber-800{% else %}bg-rose-100 text-rose-800{% endif %}">
+                {{ log.status_code }}
+              </span>
+            </td>
+            <td class="py-2 px-3 text-slate-600">{{ log.duration_ms }} ms</td>
+            <td class="py-2 px-3 text-slate-400 text-[10px]">{{ log.timestamp|date:"H:i:s" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="py-4 text-center text-slate-400">No requests recorded yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

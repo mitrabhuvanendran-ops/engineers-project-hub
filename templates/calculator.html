@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Quick Calc Tool &bull; Engineer's Project Hub{% endblock %}
+{% block header_title %}Engineering Formula Calculator{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Quick Engineering Calculations</h2>
+    <p class="text-xs sm:text-sm text-slate-500">
+      Evaluate structural mechanics, circuit equations, and thermodynamics formulas, then save directly into project documentation.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Calculator Card -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+      <!-- Preset Templates -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Preset Engineering Templates</label>
+        <select id="calc-preset-select" onchange="loadPreset(this.value)" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="">-- Choose a standard formula template --</option>
+          <option value="beam">Beam Central Bending Moment: (w * L^2) / 8 (N·m)</option>
+          <option value="ohms">Ohm's Law Voltage Drop: I * R (Volts)</option>
+          <option value="ke">Kinetic Energy: 0.5 * m * v^2 (Joules)</option>
+          <option value="power">Electrical Power: V * I (Watts)</option>
+          <option value="stress">Axial Stress: F / A (MPa)</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Calculation Title</label>
+          <input type="text" id="calc-title" value="Beam Bending Moment" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Result Unit</label>
+          <input type="text" id="calc-unit" value="N·m" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Mathematical Formula</label>
+        <div class="relative">
+          <input type="text" id="calc-formula" value="(w * (L * L)) / 8" class="w-full px-3.5 py-2 text-xs font-mono bg-blue-50/50 border border-blue-200 rounded-xl text-blue-900 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+      </div>
+
+      <!-- Variable Inputs -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-700 uppercase">Input Variables</label>
+        <div id="inputs-container" class="space-y-2">
+          <div class="flex items-center gap-2">
+            <input type="text" placeholder="Variable (e.g., w)" value="w" class="var-name w-24 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+            <span class="text-xs text-slate-400">=</span>
+            <input type="number" step="any" placeholder="Value" value="1500" class="var-value flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+            <input type="text" placeholder="Unit" value="N/m" class="var-unit w-20 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="text" placeholder="Variable (e.g., L)" value="L" class="var-name w-24 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+            <span class="text-xs text-slate-400">=</span>
+            <input type="number" step="any" placeholder="Value" value="4" class="var-value flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+            <input type="text" placeholder="Unit" value="m" class="var-unit w-20 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3 pt-2">
+        <button onclick="computeFormula()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-2">
+          <i data-lucide="play" class="w-4 h-4"></i>
+          <span>Evaluate Formula</span>
+        </button>
+      </div>
+
+      <!-- Result Banner -->
+      <div class="p-4 bg-slate-900 text-white rounded-xl flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase font-mono text-slate-400">Calculated Result</span>
+          <div class="flex items-baseline gap-2 mt-0.5">
+            <span id="calc-result-display" class="text-2xl font-bold font-mono text-emerald-400">3000</span>
+            <span id="calc-unit-display" class="text-xs text-slate-300">N·m</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save to Project Form -->
+      <form method="POST" action="{% url 'calc_create' %}" class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+        {% csrf_token %}
+        <input type="hidden" name="title" id="save-title" value="Beam Bending Moment">
+        <input type="hidden" name="formula" id="save-formula" value="(w * (L * L)) / 8">
+        <input type="hidden" name="result" id="save-result" value="3000">
+        <input type="hidden" name="unit" id="save-unit" value="N·m">
+        <input type="hidden" name="notes" id="save-notes" value="Calculated using Quick Calc Tool">
+
+        <select name="project_id" class="w-full sm:flex-1 px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white outline-none">
+          <option value="">-- Save to project (optional) --</option>
+          {% for p in user_projects %}
+          <option value="{{ p.id }}">{{ p.title }} ({{ p.category }})</option>
+          {% endfor %}
+        </select>
+
+        <button type="submit" class="w-full sm:w-auto px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm">
+          Save Calculation
+        </button>
+      </form>
+    </div>
+
+    <!-- Recent Calculations Sidebar -->
+    <div class="lg:col-span-1 space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400 mb-3">Saved Calculations</h3>
+        {% if recent_calcs %}
+        <div class="space-y-3">
+          {% for c in recent_calcs %}
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs space-y-1">
+            <div class="flex items-start justify-between">
+              <span class="font-bold text-slate-900">{{ c.title }}</span>
+              <span class="font-mono font-bold text-emerald-600">{{ c.result }} {{ c.unit }}</span>
+            </div>
+            <p class="font-mono text-[10px] text-blue-600 truncate">{{ c.formula }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-xs text-slate-400">No calculations recorded yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PRESETS = {
+    beam: {
+      title: 'Beam Central Bending Moment',
+      formula: '(w * (L * L)) / 8',
+      unit: 'N·m',
+      inputs: [
+        { name: 'w', value: '1500', unit: 'N/m' },
+        { name: 'L', value: '4', unit: 'm' }
+      ]
+    },
+    ohms: {
+      title: "Ohm's Law Voltage Drop",
+      formula: 'I * R',
+      unit: 'V',
+      inputs: [
+        { name: 'I', value: '2.5', unit: 'A' },
+        { name: 'R', value: '47', unit: 'Ω' }
+      ]
+    },
+    ke: {
+      title: 'Kinetic Energy',
+      formula: '0.5 * m * (v * v)',
+      unit: 'J',
+      inputs: [
+        { name: 'm', value: '12', unit: 'kg' },
+        { name: 'v', value: '15', unit: 'm/s' }
+      ]
+    },
+    power: {
+      title: 'Electrical Power',
+      formula: 'V * I',
+      unit: 'W',
+      inputs: [
+        { name: 'V', value: '24', unit: 'V' },
+        { name: 'I', value: '3.2', unit: 'A' }
+      ]
+    },
+    stress: {
+      title: 'Axial Mechanical Stress',
+      formula: 'F / A',
+      unit: 'MPa',
+      inputs: [
+        { name: 'F', value: '50000', unit: 'N' },
+        { name: 'A', value: '250', unit: 'mm²' }
+      ]
+    }
+  };
+
+  function loadPreset(key) {
+    if (!key || !PRESETS[key]) return;
+    const p = PRESETS[key];
+    document.getElementById('calc-title').value = p.title;
+    document.getElementById('calc-formula').value = p.formula;
+    document.getElementById('calc-unit').value = p.unit;
+
+    const container = document.getElementById('inputs-container');
+    container.innerHTML = '';
+    p.inputs.forEach(item => {
+      container.insertAdjacentHTML('beforeend', `
+        <div class="flex items-center gap-2">
+          <input type="text" placeholder="Variable" value="${item.name}" class="var-name w-24 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+          <span class="text-xs text-slate-400">=</span>
+          <input type="number" step="any" placeholder="Value" value="${item.value}" class="var-value flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono">
+          <input type="text" placeholder="Unit" value="${item.unit}" class="var-unit w-20 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+        </div>
+      `);
+    });
+    computeFormula();
+  }
+
+  function computeFormula() {
+    const formula = document.getElementById('calc-formula').value;
+    const title = document.getElementById('calc-title').value;
+    const unit = document.getElementById('calc-unit').value;
+
+    const names = document.querySelectorAll('.var-name');
+    const values = document.querySelectorAll('.var-value');
+
+    let evalExpr = formula;
+    for (let i = 0; i < names.length; i++) {
+      const varName = names[i].value.trim();
+      const varVal = parseFloat(values[i].value) || 0;
+      if (varName) {
+        const regex = new RegExp('\\b' + varName + '\\b', 'g');
+        evalExpr = evalExpr.replace(regex, `(${varVal})`);
+      }
+    }
+
+    try {
+      // Safe sanitized arithmetic evaluation
+      const sanitized = evalExpr.replace(/[^0-9+\-*/().\s]/g, '');
+      const res = Function(`'use strict'; return (${sanitized});`)();
+      const rounded = Math.round(res * 1000) / 1000;
+
+      document.getElementById('calc-result-display').innerText = rounded;
+      document.getElementById('calc-unit-display').innerText = unit;
+
+      document.getElementById('save-title').value = title;
+      document.getElementById('save-formula').value = formula;
+      document.getElementById('save-result').value = rounded;
+      document.getElementById('save-unit').value = unit;
+    } catch (e) {
+      document.getElementById('calc-result-display').innerText = 'Syntax Error';
+    }
+  }
+</script>
+{% endblock %}

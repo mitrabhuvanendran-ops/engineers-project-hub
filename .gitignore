@@ -32,3 +32,9 @@ dist-ssr
 myproject
 db.sqlite3
 
+
+# Python staticfiles & cache
+staticfiles/
+__pycache__/
+*.pyc
+media/project_files/

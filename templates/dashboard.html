@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Engineering Dashboard &bull; Engineer's Project Hub{% endblock %}
+{% block header_title %}Engineering Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Engineering Welcome Banner -->
+  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-850 to-blue-950 p-6 sm:p-8 text-white shadow-lg border border-slate-800">
+    <div class="relative z-10 max-w-2xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-mono font-medium border border-blue-500/30 mb-4">
+        <i data-lucide="cpu" class="w-3.5 h-3.5 text-blue-400"></i>
+        <span>Welcome back, {{ user.first_name|default:user.username }}</span>
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+        Engineer's Project Hub
+      </h2>
+      <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+        Track engineering designs, organize technical notes, calculate structural & circuit formulas, and manage documentation — all unified in one centralized engineering workspace.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button onclick="openNewProjectModal()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg shadow-sm transition-all shadow-blue-600/30 flex items-center gap-2">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Create New Project</span>
+        </button>
+
+        <a href="{% url 'calculator' %}" class="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-medium text-sm rounded-lg border border-slate-700 transition-colors flex items-center gap-2">
+          <i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i>
+          <span>Quick Formula Tool</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Projects -->
+    <a href="{% url 'projects_list' %}" class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Projects</span>
+        <div class="p-2 rounded-lg border bg-blue-50 border-blue-100 text-blue-600 group-hover:scale-105 transition-transform">
+          <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-slate-900 tracking-tight font-mono">{{ total_projects }}</span>
+        <span class="text-xs text-slate-400">projects</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Managed repositories</p>
+    </a>
+
+    <!-- In Progress -->
+    <a href="{% url 'projects_list' %}?status=In Progress" class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">In Progress</span>
+        <div class="p-2 rounded-lg border bg-blue-50 border-blue-100 text-blue-600 group-hover:scale-105 transition-transform">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-slate-900 tracking-tight font-mono">{{ in_progress }}</span>
+        <span class="text-xs text-slate-400">projects</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Active development</p>
+    </a>
+
+    <!-- Completed -->
+    <a href="{% url 'projects_list' %}?status=Completed" class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completed</span>
+        <div class="p-2 rounded-lg border bg-emerald-50 border-emerald-100 text-emerald-600 group-hover:scale-105 transition-transform">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-slate-900 tracking-tight font-mono">{{ completed }}</span>
+        <span class="text-xs text-slate-400">projects</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Successfully deployed</p>
+    </a>
+
+    <!-- Not Started -->
+    <a href="{% url 'projects_list' %}?status=Not Started" class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Not Started</span>
+        <div class="p-2 rounded-lg border bg-slate-100 border-slate-200 text-slate-600 group-hover:scale-105 transition-transform">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-slate-900 tracking-tight font-mono">{{ not_started }}</span>
+        <span class="text-xs text-slate-400">projects</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Backlog & planning</p>
+    </a>
+  </div>
+
+  <!-- Two Column Layout: Recent Projects & Discipline Distribution -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: Recent Projects -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="font-semibold text-slate-800 text-sm">Recently Updated Projects</h3>
+          </div>
+          <a href="{% url 'projects_list' %}" class="text-xs text-blue-600 hover:text-blue-700 font-medium">View All &rarr;</a>
+        </div>
+
+        {% if recent_projects %}
+        <div class="divide-y divide-slate-100">
+          {% for project in recent_projects %}
+          <a href="{% url 'project_detail' project.id %}" class="py-3 px-2 -mx-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-lg hover:bg-slate-50 transition-colors group block">
+            <div class="min-w-0 flex-1">
+              <h4 class="font-medium text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                {{ project.title }}
+              </h4>
+              <p class="text-xs text-slate-500 truncate mt-0.5">
+                {{ project.description|default:"No description provided." }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
+                {{ project.category }}
+              </span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-medium {% if project.status == 'Completed' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif project.status == 'In Progress' %}bg-blue-50 text-blue-700 border border-blue-200{% else %}bg-slate-100 text-slate-600{% endif %}">
+                {{ project.status }}
+              </span>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all"></i>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State for Fresh New Users -->
+        <div class="p-8 text-center">
+          <i data-lucide="folder-kanban" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+          <h4 class="font-semibold text-slate-800 text-sm mb-1">No Projects Yet</h4>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+            Your workspace is fresh and clean. Start documenting your first engineering design, formulas, and progress.
+          </p>
+          <button onclick="openNewProjectModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Create First Project</span>
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: Discipline Distribution -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="font-semibold text-slate-800 text-sm">Discipline Distribution</h3>
+          </div>
+        </div>
+
+        {% if category_data %}
+        <div class="space-y-3">
+          {% for item in category_data %}
+          <a href="{% url 'projects_list' %}?category={{ item.category }}" class="block group">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-medium text-slate-700 group-hover:text-blue-600 transition-colors">
+                {{ item.category }}
+              </span>
+              <span class="text-slate-400 font-mono">{{ item.count }} ({{ item.pct }}%)</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full" style="width: {{ item.pct }}%"></div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-6 text-center text-slate-400 text-xs">
+          No discipline metrics yet. Create projects to populate breakdown.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

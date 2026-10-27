@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}My Projects &bull; Engineer's Project Hub{% endblock %}
+{% block header_title %}Project Directory{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Top Header Row -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-900 tracking-tight">Project Directory</h2>
+      <p class="text-xs sm:text-sm text-slate-500">
+        Browse, search, and manage your active engineering repositories.
+      </p>
+    </div>
+    <button onclick="openNewProjectModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm transition-all shadow-blue-500/20">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      <span>New Project</span>
+    </button>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm">
+    <form method="GET" action="{% url 'projects_list' %}" class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </div>
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title or technical keywords..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+      </div>
+
+      <!-- Filters Row -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Category Filter -->
+        <select name="category" onchange="this.form.submit()" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All Disciplines</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+
+        <!-- Status Filter -->
+        <select name="status" onchange="this.form.submit()" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="All" {% if selected_status == 'All' %}selected{% endif %}>All Statuses</option>
+          <option value="Not Started" {% if selected_status == 'Not Started' %}selected{% endif %}>Not Started</option>
+          <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+          <option value="Completed" {% if selected_status == 'Completed' %}selected{% endif %}>Completed</option>
+        </select>
+
+        <!-- Submit Filter Button -->
+        <button type="submit" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+          Filter
+        </button>
+        {% if search_query or selected_category != 'All' or selected_status != 'All' %}
+        <a href="{% url 'projects_list' %}" class="px-2.5 py-2 text-xs text-slate-500 hover:text-slate-800">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Project Cards Grid -->
+  {% if projects %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    {% for project in projects %}
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+      <div>
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
+            {{ project.category }}
+          </span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-medium {% if project.status == 'Completed' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif project.status == 'In Progress' %}bg-blue-50 text-blue-700 border border-blue-200{% else %}bg-slate-100 text-slate-600{% endif %}">
+            {{ project.status }}
+          </span>
+        </div>
+
+        <h3 class="font-bold text-slate-900 text-base mb-1.5 group-hover:text-blue-600 transition-colors">
+          <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+        </h3>
+
+        <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+          {{ project.description|default:"No technical description provided yet." }}
+        </p>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400 font-mono">{{ project.updated_at|date:"M d, Y" }}</span>
+        <div class="flex items-center gap-2">
+          <a href="{% url 'project_detail' project.id %}" class="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1">
+            <span>Open Hub</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <!-- Empty State (When no projects exist for a fresh new user) -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm my-6">
+    <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-4">
+      <i data-lucide="folder-kanban" class="w-8 h-8"></i>
+    </div>
+    <h3 class="text-lg font-bold text-slate-800 mb-1">No Projects Found</h3>
+    <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">
+      {% if search_query or selected_category != 'All' or selected_status != 'All' %}
+      No projects matched your active filters. Try adjusting your search query or reset filters.
+      {% else %}
+      Get started by creating your first engineering project to document your hardware designs, circuit schematics, notes, and calculations.
+      {% endif %}
+    </p>
+    {% if search_query or selected_category != 'All' or selected_status != 'All' %}
+    <a href="{% url 'projects_list' %}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg inline-block">Reset Filters</a>
+    {% else %}
+    <button onclick="openNewProjectModal()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg shadow-sm transition-colors inline-flex items-center gap-2">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      <span>Create Your First Project</span>
+    </button>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
