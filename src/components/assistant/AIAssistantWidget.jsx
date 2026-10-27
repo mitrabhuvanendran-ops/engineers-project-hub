@@ -541,3 +541,4 @@ export function AIAssistantWidget({ initialPrompt = null, onClearInitialPrompt =
     </>
   );
 }
+

@@ -328,3 +328,4 @@ export function HealthCheckView() {
     </div>
   );
 }
+

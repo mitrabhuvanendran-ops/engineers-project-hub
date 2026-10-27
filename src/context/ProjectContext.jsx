@@ -50,17 +50,22 @@ export function ProjectProvider({ children }) {
 
     if (!isSupabaseConfigured || !supabase) {
       // Local/Demo Mode Persistence
+      const isDemo = Boolean(user.isDemo || user.id === 'demo-user-001');
       const stored = localStorage.getItem(`hub_projects_${user.id}`);
       if (stored) {
         try {
           setProjects(JSON.parse(stored));
         } catch (e) {
-          setProjects(INITIAL_DEMO_PROJECTS);
-          localStorage.setItem(`hub_projects_${user.id}`, JSON.stringify(INITIAL_DEMO_PROJECTS));
+          const fallback = isDemo ? INITIAL_DEMO_PROJECTS : [];
+          setProjects(fallback);
+          localStorage.setItem(`hub_projects_${user.id}`, JSON.stringify(fallback));
         }
       } else {
-        setProjects(INITIAL_DEMO_PROJECTS);
-        localStorage.setItem(`hub_projects_${user.id}`, JSON.stringify(INITIAL_DEMO_PROJECTS));
+        // If a new person logs in or creates an account, start fresh with an empty project list
+        // Only the 1-click evaluation demo account receives pre-populated demo projects
+        const initial = isDemo ? INITIAL_DEMO_PROJECTS : [];
+        setProjects(initial);
+        localStorage.setItem(`hub_projects_${user.id}`, JSON.stringify(initial));
       }
       setLoading(false);
       return;
@@ -98,9 +103,10 @@ export function ProjectProvider({ children }) {
       const storedCalcs = localStorage.getItem(`hub_calcs_${user.id}`);
       const storedFiles = localStorage.getItem(`hub_files_${user.id}`);
 
-      const allNotes = storedNotes ? JSON.parse(storedNotes) : INITIAL_DEMO_NOTES;
-      const allCalcs = storedCalcs ? JSON.parse(storedCalcs) : INITIAL_DEMO_CALCULATIONS;
-      const allFiles = storedFiles ? JSON.parse(storedFiles) : INITIAL_DEMO_FILES;
+      const isDemo = Boolean(user.isDemo || user.id === 'demo-user-001');
+      const allNotes = storedNotes ? JSON.parse(storedNotes) : (isDemo ? INITIAL_DEMO_NOTES : []);
+      const allCalcs = storedCalcs ? JSON.parse(storedCalcs) : (isDemo ? INITIAL_DEMO_CALCULATIONS : []);
+      const allFiles = storedFiles ? JSON.parse(storedFiles) : (isDemo ? INITIAL_DEMO_FILES : []);
 
       setNotes(allNotes.filter(n => n.project_id === projectId));
       setCalculations(allCalcs.filter(c => c.project_id === projectId));

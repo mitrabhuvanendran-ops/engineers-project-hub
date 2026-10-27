@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useProjects } from './context/ProjectContext';
+import { LoginPage } from './components/auth/LoginPage';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { DashboardView } from './components/dashboard/DashboardView';
@@ -15,12 +16,10 @@ import { NotFoundPage } from './components/pages/NotFoundPage';
 import { ServerErrorPage } from './components/pages/ServerErrorPage';
 import { AIAssistantWidget } from './components/assistant/AIAssistantWidget';
 import { ProjectFormModal } from './components/projects/ProjectFormModal';
-import { AuthModal } from './components/auth/AuthModal';
-import { SetupGuideModal } from './components/setup/SetupGuideModal';
 import { Toast } from './components/common/Toast';
 
 export function App() {
-  const { user, loading: authLoading, isSupabaseConfigured } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     activeProjectId, 
     setActiveProjectId, 
@@ -34,9 +33,6 @@ export function App() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState('login');
-  const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
   const [assistantPrompt, setAssistantPrompt] = useState(null);
 
   // Synchronize route with window URL pathname or hash (handles custom 404 page for unknown URLs)
@@ -82,11 +78,6 @@ export function App() {
     };
   }, []);
 
-  const handleOpenAuth = (mode = 'login') => {
-    setAuthModalMode(mode);
-    setIsAuthModalOpen(true);
-  };
-
   const handleOpenProject = (projectId) => {
     setActiveProjectId(projectId);
     setCurrentView('workspace');
@@ -121,6 +112,22 @@ export function App() {
     );
   }
 
+  // REQUIREMENT: Show Login Page Initially when not logged in
+  if (!user) {
+    return (
+      <>
+        <Toast toast={toast} onClose={closeToast} />
+        {/* Persistent AI Assistant on every page including Login */}
+        <AIAssistantWidget
+          initialPrompt={assistantPrompt}
+          onClearInitialPrompt={() => setAssistantPrompt(null)}
+        />
+        <LoginPage />
+      </>
+    );
+  }
+
+  // Once authenticated, show main application dashboard and workspace
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans relative">
       {/* Toast Notification Provider */}
@@ -139,15 +146,7 @@ export function App() {
           setCurrentView(view);
           window.location.hash = view;
         }}
-        onOpenNewProject={() => {
-          if (!user && isSupabaseConfigured) {
-            handleOpenAuth('register');
-          } else {
-            setIsNewProjectModalOpen(true);
-          }
-        }}
-        onOpenAuth={handleOpenAuth}
-        onOpenSetup={() => setIsSetupModalOpen(true)}
+        onOpenNewProject={() => setIsNewProjectModalOpen(true)}
         isOpen={sidebarOpen}
         setIsOpen={setSidebarOpen}
       />
@@ -158,15 +157,7 @@ export function App() {
         <Header
           currentView={currentView}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          onOpenNewProject={() => {
-            if (!user && isSupabaseConfigured) {
-              handleOpenAuth('register');
-            } else {
-              setIsNewProjectModalOpen(true);
-            }
-          }}
-          onOpenSetup={() => setIsSetupModalOpen(true)}
-          onOpenAuth={handleOpenAuth}
+          onOpenNewProject={() => setIsNewProjectModalOpen(true)}
         />
 
         {/* Content Body */}
@@ -174,38 +165,25 @@ export function App() {
           {projectsLoading && (currentView === 'projects' || currentView === 'dashboard') ? (
             <div className="py-16 text-center">
               <div className="w-8 h-8 border-3 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-xs text-slate-500 font-mono">Synchronizing projects...</p>
+              <p className="text-xs text-slate-500 font-mono">Loading projects...</p>
             </div>
           ) : (
             <>
               {currentView === 'dashboard' && (
                 <DashboardView
-                  onOpenNewProject={() => {
-                    if (!user && isSupabaseConfigured) {
-                      handleOpenAuth('register');
-                    } else {
-                      setIsNewProjectModalOpen(true);
-                    }
-                  }}
+                  onOpenNewProject={() => setIsNewProjectModalOpen(true)}
                   onOpenProject={handleOpenProject}
                   setCurrentView={(v) => {
                     setCurrentView(v);
                     window.location.hash = v;
                   }}
-                  onOpenAuth={handleOpenAuth}
                 />
               )}
 
               {currentView === 'projects' && (
                 <ProjectsView
                   onOpenProject={handleOpenProject}
-                  onOpenNewProject={() => {
-                    if (!user && isSupabaseConfigured) {
-                      handleOpenAuth('register');
-                    } else {
-                      setIsNewProjectModalOpen(true);
-                    }
-                  }}
+                  onOpenNewProject={() => setIsNewProjectModalOpen(true)}
                 />
               )}
 
@@ -262,20 +240,15 @@ export function App() {
           )}
         </main>
 
-        {/* Clean Engineering Footer */}
+        {/* Clean Professional Footer */}
         <footer className="border-t border-slate-200 bg-white py-4 px-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-700">Engineer's Project Hub</span>
             <span className="text-slate-300">•</span>
-            <span>AI Assistant & SQL Backend Integrated</span>
+            <span>Empowering Engineering Projects & Research</span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono">
-            <span>React + Vite</span>
-            <span>Supabase SQL</span>
-            <span>MongoDB Logging</span>
-            <span className="cursor-pointer text-slate-600 hover:text-brand-600" onClick={() => setCurrentView('health')}>
-              /health
-            </span>
+          <div className="flex items-center gap-4 text-[11px] text-slate-400">
+            <span>© {new Date().getFullYear()} Engineer's Project Hub. All rights reserved.</span>
           </div>
         </footer>
       </div>
@@ -287,21 +260,6 @@ export function App() {
           onClose={() => setIsNewProjectModalOpen(false)}
           onSubmit={handleCreateProjectSubmit}
           loading={actionLoading}
-        />
-      )}
-
-      {isAuthModalOpen && (
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-          initialMode={authModalMode}
-        />
-      )}
-
-      {isSetupModalOpen && (
-        <SetupGuideModal
-          isOpen={isSetupModalOpen}
-          onClose={() => setIsSetupModalOpen(false)}
         />
       )}
     </div>

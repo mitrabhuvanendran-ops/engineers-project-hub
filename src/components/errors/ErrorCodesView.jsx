@@ -150,3 +150,4 @@ export function ErrorCodesView({ onAskAssistant }) {
     </div>
   );
 }
+

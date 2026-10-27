@@ -3,25 +3,21 @@ import {
   LayoutDashboard, 
   FolderKanban, 
   Calculator, 
-  Database, 
   LogOut, 
-  User, 
   Cpu, 
   Plus, 
   Layers,
-  Sparkles,
   HelpCircle,
   AlertTriangle,
   Ticket,
-  Activity,
-  FileQuestion
+  Activity
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
 import { PROJECT_CATEGORIES } from '../../constants';
 
-export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenAuth, onOpenSetup, isOpen, setIsOpen }) {
-  const { user, signOut, isSupabaseConfigured } = useAuth();
+export function Sidebar({ currentView, setCurrentView, onOpenNewProject, isOpen, setIsOpen }) {
+  const { user, signOut } = useAuth();
   const { stats, categoryFilter, setCategoryFilter } = useProjects();
 
   const handleNav = (view) => {
@@ -65,7 +61,7 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
               Engineer's Hub
               <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 bg-brand-500/20 text-brand-300 rounded border border-brand-500/30">v1.0</span>
             </h1>
-            <p className="text-xs text-slate-400">Project & Calc Cockpit</p>
+            <p className="text-xs text-slate-400">Engineering Workspace</p>
           </div>
         </div>
 
@@ -142,7 +138,35 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             </button>
           </div>
 
-          {/* Assessment Knowledgebase & Diagnostics */}
+          {/* Project Disciplines Quick Filters */}
+          <div className="space-y-1">
+            <div className="px-3 pb-2 flex items-center justify-between text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              <span>Disciplines</span>
+              <Layers className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+            <div className="space-y-0.5">
+              {PROJECT_CATEGORIES.slice(0, 6).map((cat) => {
+                const count = stats.categoryCounts[cat] || 0;
+                const isSelected = categoryFilter === cat && currentView === 'projects';
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategoryClick(cat)}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs transition-colors ${
+                      isSelected
+                        ? 'bg-slate-800 text-brand-400 font-medium'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    <span className="font-mono text-[10px] text-slate-400">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Support and System */}
           <div className="space-y-1">
             <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
               Support & System
@@ -159,11 +183,8 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             >
               <div className="flex items-center gap-3">
                 <HelpCircle className="w-4 h-4 text-amber-400" />
-                <span>FAQs (SQL DB)</span>
+                <span>Frequently Asked Questions</span>
               </div>
-              <span className="text-[10px] font-mono bg-amber-500/10 text-amber-300 px-1.5 py-0.2 rounded border border-amber-500/20">
-                10+
-              </span>
             </button>
 
             {/* Error Codes */}
@@ -177,11 +198,8 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             >
               <div className="flex items-center gap-3">
                 <AlertTriangle className="w-4 h-4 text-rose-400" />
-                <span>Error Codes</span>
+                <span>Error Code Directory</span>
               </div>
-              <span className="text-[10px] font-mono bg-rose-500/10 text-rose-300 px-1.5 py-0.2 rounded border border-rose-500/20">
-                8 Codes
-              </span>
             </button>
 
             {/* Support Tickets */}
@@ -197,9 +215,6 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
                 <Ticket className="w-4 h-4 text-indigo-400" />
                 <span>Support Tickets</span>
               </div>
-              <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 px-1.5 py-0.2 rounded border border-indigo-500/20">
-                SQL
-              </span>
             </button>
 
             {/* Health Check Page */}
@@ -213,95 +228,37 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             >
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4 text-emerald-400" />
-                <span>Health Check</span>
+                <span>System Health</span>
               </div>
-              <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">
-                200 OK
-              </span>
-            </button>
-
-            {/* Test 404 & 500 Custom Pages */}
-            <div className="pt-2 px-3 text-[10px] text-slate-500 uppercase tracking-wider flex items-center justify-between">
-              <span>Test Error Pages</span>
-              <FileQuestion className="w-3 h-3 text-slate-500" />
-            </div>
-            <div className="flex items-center gap-1.5 px-3 pt-1">
-              <button
-                onClick={() => handleNav('404')}
-                className="flex-1 py-1 px-2 rounded bg-slate-800/60 hover:bg-slate-800 text-[11px] text-slate-300 text-center font-mono hover:text-amber-300 transition-colors"
-                title="Preview Custom 404 page"
-              >
-                Custom 404
-              </button>
-              <button
-                onClick={() => handleNav('500')}
-                className="flex-1 py-1 px-2 rounded bg-slate-800/60 hover:bg-slate-800 text-[11px] text-slate-300 text-center font-mono hover:text-rose-300 transition-colors"
-                title="Preview Custom 500 page"
-              >
-                Custom 500
-              </button>
-            </div>
-          </div>
-
-          {/* Database Setup Card */}
-          <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
-            <div className="flex items-center gap-2 mb-2">
-              <Database className="w-4 h-4 text-brand-400" />
-              <span className="text-xs font-semibold text-slate-200">Supabase Backend</span>
-            </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed mb-2.5">
-              {isSupabaseConfigured
-                ? 'Connected to live PostgreSQL database & RLS.'
-                : 'Running in Local Demo mode. Connect Supabase anytime.'}
-            </p>
-            <button
-              onClick={() => {
-                onOpenSetup();
-                if (window.innerWidth < 1024) setIsOpen(false);
-              }}
-              className="w-full text-center py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg transition-colors border border-slate-700/60 flex items-center justify-center gap-1.5"
-            >
-              <Sparkles className="w-3 h-3 text-brand-400" />
-              {isSupabaseConfigured ? 'View DB Status' : 'Connect Supabase'}
             </button>
           </div>
         </div>
 
         {/* User Account / Footer */}
         <div className="p-3 border-t border-slate-800 bg-slate-950/80">
-          {user ? (
-            <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/60">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {user.user_metadata?.full_name
-                    ? user.user_metadata.full_name.charAt(0).toUpperCase()
-                    : user.email?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-white truncate">
-                    {user.user_metadata?.full_name || 'Engineer'}
-                  </p>
-                  <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
-                </div>
+          <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/60">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                {user?.user_metadata?.full_name
+                  ? user.user_metadata.full_name.charAt(0).toUpperCase()
+                  : user?.email?.charAt(0).toUpperCase() || 'E'}
               </div>
-              <button
-                onClick={signOut}
-                title="Log out"
-                className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
-                aria-label="Log out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-white truncate">
+                  {user?.user_metadata?.full_name || 'Engineer'}
+                </p>
+                <p className="text-[11px] text-slate-400 truncate">{user?.email || 'Logged In'}</p>
+              </div>
             </div>
-          ) : (
             <button
-              onClick={onOpenAuth}
-              className="w-full py-2 px-3 bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
+              onClick={signOut}
+              title="Sign Out"
+              className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
+              aria-label="Sign Out"
             >
-              <User className="w-4 h-4" />
-              <span>Sign In / Register</span>
+              <LogOut className="w-4 h-4" />
             </button>
-          )}
+          </div>
         </div>
       </aside>
     </>

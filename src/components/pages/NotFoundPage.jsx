@@ -50,3 +50,4 @@ export function NotFoundPage({ onGoHome, onAskAssistant }) {
     </div>
   );
 }
+

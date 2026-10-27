@@ -65,3 +65,4 @@ export async function submitChatFeedback({ messageId, isHelpful, userComment, pr
     return { success: true, destination: 'client_local_storage' };
   }
 }
+

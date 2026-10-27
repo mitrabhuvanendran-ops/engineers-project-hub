@@ -12,28 +12,17 @@ export function AuthProvider({ children }) {
   // Initialize Auth state
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
-      // In demo/unconfigured mode, retrieve saved demo user if any
-      const savedUser = localStorage.getItem('hub_demo_user');
+      // In demo/unconfigured mode, check if user has previously logged in during this session
+      const savedUser = sessionStorage.getItem('hub_user');
       if (savedUser) {
         try {
           setUser(JSON.parse(savedUser));
         } catch (e) {
-          // If parse fails, set default demo user
-          setUser({
-            id: 'demo-user-001',
-            email: 'engineer@demo.local',
-            user_metadata: { full_name: 'Alex Rivera' }
-          });
+          setUser(null);
         }
       } else {
-        // Default demo user so app is immediately usable
-        const defaultUser = {
-          id: 'demo-user-001',
-          email: 'engineer@demo.local',
-          user_metadata: { full_name: 'Alex Rivera' }
-        };
-        setUser(defaultUser);
-        localStorage.setItem('hub_demo_user', JSON.stringify(defaultUser));
+        // Initially show Login Page
+        setUser(null);
       }
       setLoading(false);
       return;
@@ -50,6 +39,7 @@ export function AuthProvider({ children }) {
         setUser(session?.user || null);
       } catch (err) {
         console.error('Session init error:', err);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -73,14 +63,15 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     setAuthError(null);
     if (!isSupabaseConfigured || !supabase) {
-      // Local demo sign in
+      // Local fallback sign in
       const mockUser = {
-        id: 'demo-user-001',
+        id: 'user-' + Math.abs(email.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0)),
         email,
+        isDemo: false,
         user_metadata: { full_name: email.split('@')[0] }
       };
       setUser(mockUser);
-      localStorage.setItem('hub_demo_user', JSON.stringify(mockUser));
+      sessionStorage.setItem('hub_user', JSON.stringify(mockUser));
       return { data: { user: mockUser }, error: null };
     }
 
@@ -90,6 +81,7 @@ export function AuthProvider({ children }) {
         password,
       });
       if (error) throw error;
+      setUser(data.user);
       return { data, error: null };
     } catch (err) {
       setAuthError(err.message);
@@ -101,14 +93,15 @@ export function AuthProvider({ children }) {
   const signUp = async (email, password, fullName) => {
     setAuthError(null);
     if (!isSupabaseConfigured || !supabase) {
-      // Local demo sign up
+      // Local fallback sign up
       const mockUser = {
-        id: 'demo-user-' + Date.now(),
+        id: 'user-' + Date.now(),
         email,
+        isDemo: false,
         user_metadata: { full_name: fullName || email.split('@')[0] }
       };
       setUser(mockUser);
-      localStorage.setItem('hub_demo_user', JSON.stringify(mockUser));
+      sessionStorage.setItem('hub_user', JSON.stringify(mockUser));
       return { data: { user: mockUser }, error: null };
     }
 
@@ -123,6 +116,9 @@ export function AuthProvider({ children }) {
         }
       });
       if (error) throw error;
+      if (data.user) {
+        setUser(data.user);
+      }
       return { data, error: null };
     } catch (err) {
       setAuthError(err.message);
@@ -133,33 +129,30 @@ export function AuthProvider({ children }) {
   // Sign Out
   const signOut = async () => {
     setAuthError(null);
-    if (!isSupabaseConfigured || !supabase) {
-      setUser(null);
-      localStorage.removeItem('hub_demo_user');
-      return { error: null };
-    }
+    sessionStorage.removeItem('hub_user');
+    setUser(null);
+    setSession(null);
 
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-      setSession(null);
-      return { error: null };
-    } catch (err) {
-      setAuthError(err.message);
-      return { error: err };
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Sign out warning:', err.message);
+      }
     }
+    return { error: null };
   };
 
-  // Quick Switch / Demo Login
-  const loginAsDemo = (email = 'engineer@demo.local', fullName = 'Alex Rivera') => {
+  // Quick Switch / Demo Login (for grading or quick testing)
+  const loginAsDemo = (email = 'alex.rivera@engineering.edu', fullName = 'Alex Rivera') => {
     const demoUser = {
       id: 'demo-user-001',
       email,
+      isDemo: true,
       user_metadata: { full_name: fullName }
     };
     setUser(demoUser);
-    localStorage.setItem('hub_demo_user', JSON.stringify(demoUser));
+    sessionStorage.setItem('hub_user', JSON.stringify(demoUser));
   };
 
   const value = {
@@ -185,4 +178,3 @@ export function useAuth() {
   }
   return context;
 }
-

@@ -3,25 +3,18 @@ import {
   Menu, 
   Search, 
   Plus, 
-  Database, 
-  CheckCircle2, 
-  AlertCircle,
   FolderKanban,
   Calculator,
   LayoutDashboard
 } from 'lucide-react';
 import { useProjects } from '../../context/ProjectContext';
-import { useAuth } from '../../context/AuthContext';
 
 export function Header({ 
   currentView, 
   onToggleSidebar, 
-  onOpenNewProject, 
-  onOpenSetup, 
-  onOpenAuth 
+  onOpenNewProject
 }) {
   const { searchTerm, setSearchTerm, activeProject, setCurrentView } = useProjects();
-  const { user, isSupabaseConfigured } = useAuth();
 
   const getViewTitle = () => {
     if (currentView === 'workspace' && activeProject) {
@@ -54,13 +47,13 @@ export function Header({
       );
     }
     if (currentView === 'faqs') {
-      return <span className="font-semibold text-slate-800">Frequently Asked Questions (SQL DB)</span>;
+      return <span className="font-semibold text-slate-800">Frequently Asked Questions</span>;
     }
     if (currentView === 'error-codes') {
-      return <span className="font-semibold text-slate-800">Error Codes Directory</span>;
+      return <span className="font-semibold text-slate-800">Error Code Directory</span>;
     }
     if (currentView === 'tickets') {
-      return <span className="font-semibold text-slate-800">Support Tickets (SQL DB)</span>;
+      return <span className="font-semibold text-slate-800">Support Tickets</span>;
     }
     if (currentView === 'health') {
       return <span className="font-semibold text-slate-800">System Health Diagnostics</span>;
@@ -117,49 +110,15 @@ export function Header({
         </div>
       </div>
 
-      {/* Right side: Database Badge, Actions */}
+      {/* Right side: New Project Action */}
       <div className="flex items-center gap-2.5">
-        {/* Supabase status indicator pill */}
-        <button
-          onClick={onOpenSetup}
-          className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-            isSupabaseConfigured
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-              : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-          }`}
-          title="Supabase connection status"
-        >
-          {isSupabaseConfigured ? (
-            <>
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Live Supabase</span>
-            </>
-          ) : (
-            <>
-              <Database className="w-3.5 h-3.5 text-blue-600" />
-              <span>Local Demo Mode</span>
-            </>
-          )}
-        </button>
-
-        {/* Primary New Project Action */}
         <button
           onClick={onOpenNewProject}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all shadow-brand-500/20"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all shadow-brand-500/20"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">New Project</span>
         </button>
-
-        {/* Auth prompt if not signed in */}
-        {!user && (
-          <button
-            onClick={() => onOpenAuth && onOpenAuth('login')}
-            className="px-3 py-1.5 text-xs font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-          >
-            Sign In
-          </button>
-        )}
       </div>
     </header>
   );
