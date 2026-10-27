@@ -9,7 +9,12 @@ import {
   Cpu, 
   Plus, 
   Layers,
-  Sparkles
+  Sparkles,
+  HelpCircle,
+  AlertTriangle,
+  Ticket,
+  Activity,
+  FileQuestion
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
@@ -79,7 +84,7 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
           <div className="space-y-1">
             <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
               Main Menu
@@ -88,7 +93,7 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             {/* Dashboard */}
             <button
               onClick={() => handleNav('dashboard')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentView === 'dashboard'
                   ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
                   : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
@@ -106,7 +111,7 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
             {/* My Projects */}
             <button
               onClick={() => handleNav('projects')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentView === 'projects' || currentView === 'workspace'
                   ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
                   : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
@@ -117,14 +122,14 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
                 <span>My Projects</span>
               </div>
               <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">
-                {stats.inProgress} active
+                {stats.inProgress}
               </span>
             </button>
 
             {/* Engineering Formula Calculator */}
             <button
               onClick={() => handleNav('calculator')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentView === 'calculator'
                   ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
                   : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
@@ -134,37 +139,107 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
                 <Calculator className="w-4 h-4 text-emerald-400" />
                 <span>Quick Calc Tool</span>
               </div>
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                Live
-              </span>
             </button>
           </div>
 
-          {/* Project Disciplines Quick Filters */}
+          {/* Assessment Knowledgebase & Diagnostics */}
           <div className="space-y-1">
-            <div className="px-3 pb-2 flex items-center justify-between text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              <span>Disciplines</span>
-              <Layers className="w-3.5 h-3.5 text-slate-400" />
+            <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Support & System
             </div>
-            <div className="space-y-0.5">
-              {PROJECT_CATEGORIES.slice(0, 6).map((cat) => {
-                const count = stats.categoryCounts[cat] || 0;
-                const isSelected = categoryFilter === cat && currentView === 'projects';
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => handleCategoryClick(cat)}
-                    className={`w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs transition-colors ${
-                      isSelected
-                        ? 'bg-slate-800 text-brand-400 font-medium'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-                    }`}
-                  >
-                    <span>{cat}</span>
-                    <span className="font-mono text-[10px] text-slate-400">{count}</span>
-                  </button>
-                );
-              })}
+
+            {/* FAQs */}
+            <button
+              onClick={() => handleNav('faqs')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentView === 'faqs'
+                  ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
+                  : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-4 h-4 text-amber-400" />
+                <span>FAQs (SQL DB)</span>
+              </div>
+              <span className="text-[10px] font-mono bg-amber-500/10 text-amber-300 px-1.5 py-0.2 rounded border border-amber-500/20">
+                10+
+              </span>
+            </button>
+
+            {/* Error Codes */}
+            <button
+              onClick={() => handleNav('error-codes')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentView === 'error-codes'
+                  ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
+                  : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-4 h-4 text-rose-400" />
+                <span>Error Codes</span>
+              </div>
+              <span className="text-[10px] font-mono bg-rose-500/10 text-rose-300 px-1.5 py-0.2 rounded border border-rose-500/20">
+                8 Codes
+              </span>
+            </button>
+
+            {/* Support Tickets */}
+            <button
+              onClick={() => handleNav('tickets')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentView === 'tickets'
+                  ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
+                  : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Ticket className="w-4 h-4 text-indigo-400" />
+                <span>Support Tickets</span>
+              </div>
+              <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 px-1.5 py-0.2 rounded border border-indigo-500/20">
+                SQL
+              </span>
+            </button>
+
+            {/* Health Check Page */}
+            <button
+              onClick={() => handleNav('health')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentView === 'health'
+                  ? 'bg-brand-600/20 text-white border-l-4 border-brand-500 pl-2'
+                  : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Activity className="w-4 h-4 text-emerald-400" />
+                <span>Health Check</span>
+              </div>
+              <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">
+                200 OK
+              </span>
+            </button>
+
+            {/* Test 404 & 500 Custom Pages */}
+            <div className="pt-2 px-3 text-[10px] text-slate-500 uppercase tracking-wider flex items-center justify-between">
+              <span>Test Error Pages</span>
+              <FileQuestion className="w-3 h-3 text-slate-500" />
+            </div>
+            <div className="flex items-center gap-1.5 px-3 pt-1">
+              <button
+                onClick={() => handleNav('404')}
+                className="flex-1 py-1 px-2 rounded bg-slate-800/60 hover:bg-slate-800 text-[11px] text-slate-300 text-center font-mono hover:text-amber-300 transition-colors"
+                title="Preview Custom 404 page"
+              >
+                Custom 404
+              </button>
+              <button
+                onClick={() => handleNav('500')}
+                className="flex-1 py-1 px-2 rounded bg-slate-800/60 hover:bg-slate-800 text-[11px] text-slate-300 text-center font-mono hover:text-rose-300 transition-colors"
+                title="Preview Custom 500 page"
+              >
+                Custom 500
+              </button>
             </div>
           </div>
 
@@ -232,4 +307,3 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
     </>
   );
 }
-

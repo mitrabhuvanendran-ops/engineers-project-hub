@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useProjects } from './context/ProjectContext';
 import { Sidebar } from './components/layout/Sidebar';
@@ -7,13 +7,20 @@ import { DashboardView } from './components/dashboard/DashboardView';
 import { ProjectsView } from './components/projects/ProjectsView';
 import { ProjectWorkspace } from './components/workspace/ProjectWorkspace';
 import { QuickCalculatorWidget } from './components/workspace/QuickCalculatorWidget';
+import { FAQView } from './components/faq/FAQView';
+import { ErrorCodesView } from './components/errors/ErrorCodesView';
+import { SupportTicketsView } from './components/tickets/SupportTicketsView';
+import { HealthCheckView } from './components/health/HealthCheckView';
+import { NotFoundPage } from './components/pages/NotFoundPage';
+import { ServerErrorPage } from './components/pages/ServerErrorPage';
+import { AIAssistantWidget } from './components/assistant/AIAssistantWidget';
 import { ProjectFormModal } from './components/projects/ProjectFormModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { SetupGuideModal } from './components/setup/SetupGuideModal';
 import { Toast } from './components/common/Toast';
 
 export function App() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isSupabaseConfigured } = useAuth();
   const { 
     activeProjectId, 
     setActiveProjectId, 
@@ -24,31 +31,76 @@ export function App() {
     loading: projectsLoading
   } = useProjects();
 
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'projects' | 'workspace' | 'calculator'
+  const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
+  const [assistantPrompt, setAssistantPrompt] = useState(null);
+
+  // Synchronize route with window URL pathname or hash (handles custom 404 page for unknown URLs)
+  useEffect(() => {
+    const handleUrlRoute = () => {
+      const pathname = window.location.pathname.replace(/^\/+/g, '');
+      const hash = window.location.hash.replace(/^#\/?/g, '');
+      const target = hash || pathname;
+
+      if (!target || target === '' || target === 'index.html' || target === 'dashboard') {
+        setCurrentView('dashboard');
+      } else if (target === 'projects') {
+        setCurrentView('projects');
+      } else if (target === 'calculator') {
+        setCurrentView('calculator');
+      } else if (target === 'faqs') {
+        setCurrentView('faqs');
+      } else if (target === 'error-codes' || target === 'errors') {
+        setCurrentView('error-codes');
+      } else if (target === 'tickets' || target === 'support') {
+        setCurrentView('tickets');
+      } else if (target === 'health') {
+        setCurrentView('health');
+      } else if (target === '500') {
+        setCurrentView('500');
+      } else if (target === '404') {
+        setCurrentView('404');
+      } else if (target === 'workspace') {
+        // Workspace view remains if project active
+      } else {
+        // Unknown address -> Show Custom 404 Page!
+        setCurrentView('404');
+      }
+    };
+
+    handleUrlRoute();
+    window.addEventListener('popstate', handleUrlRoute);
+    window.addEventListener('hashchange', handleUrlRoute);
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlRoute);
+      window.removeEventListener('hashchange', handleUrlRoute);
+    };
+  }, []);
 
   const handleOpenAuth = (mode = 'login') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
   };
 
-  // Navigate to project workspace
   const handleOpenProject = (projectId) => {
     setActiveProjectId(projectId);
     setCurrentView('workspace');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Back from workspace to project list
   const handleBackToProjects = () => {
     setCurrentView('projects');
   };
 
-  // Create Project handler
+  const handleAskAssistant = (promptText) => {
+    setAssistantPrompt(promptText);
+  };
+
   const handleCreateProjectSubmit = async (formData) => {
     const res = await createProject(formData);
     if (res?.success) {
@@ -70,14 +122,23 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans relative">
       {/* Toast Notification Provider */}
       <Toast toast={toast} onClose={closeToast} />
+
+      {/* AI Assistant Chat Widget (Present on EVERY page) */}
+      <AIAssistantWidget
+        initialPrompt={assistantPrompt}
+        onClearInitialPrompt={() => setAssistantPrompt(null)}
+      />
 
       {/* Sidebar Navigation */}
       <Sidebar
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          setCurrentView(view);
+          window.location.hash = view;
+        }}
         onOpenNewProject={() => {
           if (!user && isSupabaseConfigured) {
             handleOpenAuth('register');
@@ -110,7 +171,7 @@ export function App() {
 
         {/* Content Body */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {projectsLoading && currentView !== 'workspace' ? (
+          {projectsLoading && (currentView === 'projects' || currentView === 'dashboard') ? (
             <div className="py-16 text-center">
               <div className="w-8 h-8 border-3 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-xs text-slate-500 font-mono">Synchronizing projects...</p>
@@ -127,7 +188,10 @@ export function App() {
                     }
                   }}
                   onOpenProject={handleOpenProject}
-                  setCurrentView={setCurrentView}
+                  setCurrentView={(v) => {
+                    setCurrentView(v);
+                    window.location.hash = v;
+                  }}
                   onOpenAuth={handleOpenAuth}
                 />
               )}
@@ -154,6 +218,46 @@ export function App() {
                   onOpenProjectSelect={() => setCurrentView('projects')}
                 />
               )}
+
+              {currentView === 'faqs' && (
+                <FAQView onAskAssistant={handleAskAssistant} />
+              )}
+
+              {currentView === 'error-codes' && (
+                <ErrorCodesView onAskAssistant={handleAskAssistant} />
+              )}
+
+              {currentView === 'tickets' && (
+                <SupportTicketsView onAskAssistant={handleAskAssistant} />
+              )}
+
+              {currentView === 'health' && (
+                <HealthCheckView />
+              )}
+
+              {currentView === '404' && (
+                <NotFoundPage
+                  onGoHome={() => {
+                    setCurrentView('dashboard');
+                    window.location.hash = '';
+                  }}
+                  onAskAssistant={handleAskAssistant}
+                />
+              )}
+
+              {currentView === '500' && (
+                <ServerErrorPage
+                  onGoHome={() => {
+                    setCurrentView('dashboard');
+                    window.location.hash = '';
+                  }}
+                  onAskAssistant={handleAskAssistant}
+                  onRetry={() => {
+                    setCurrentView('dashboard');
+                    window.location.hash = '';
+                  }}
+                />
+              )}
             </>
           )}
         </main>
@@ -163,18 +267,20 @@ export function App() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-700">Engineer's Project Hub</span>
             <span className="text-slate-300">•</span>
-            <span>Clean Full-Stack Engineering Cockpit</span>
+            <span>AI Assistant & SQL Backend Integrated</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono">
             <span>React + Vite</span>
-            <span>Tailwind CSS</span>
-            <span>Supabase PostgreSQL & Auth</span>
+            <span>Supabase SQL</span>
+            <span>MongoDB Logging</span>
+            <span className="cursor-pointer text-slate-600 hover:text-brand-600" onClick={() => setCurrentView('health')}>
+              /health
+            </span>
           </div>
         </footer>
       </div>
 
       {/* Global Modals */}
-      {/* 1. New Project Modal */}
       {isNewProjectModalOpen && (
         <ProjectFormModal
           isOpen={isNewProjectModalOpen}
@@ -184,7 +290,6 @@ export function App() {
         />
       )}
 
-      {/* 2. Authentication Modal */}
       {isAuthModalOpen && (
         <AuthModal
           isOpen={isAuthModalOpen}
@@ -193,7 +298,6 @@ export function App() {
         />
       )}
 
-      {/* 3. Setup Guide Modal */}
       {isSetupModalOpen && (
         <SetupGuideModal
           isOpen={isSetupModalOpen}
@@ -205,4 +309,3 @@ export function App() {
 }
 
 export default App;
-

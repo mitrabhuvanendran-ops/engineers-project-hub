@@ -53,6 +53,24 @@ export function Header({
         </div>
       );
     }
+    if (currentView === 'faqs') {
+      return <span className="font-semibold text-slate-800">Frequently Asked Questions (SQL DB)</span>;
+    }
+    if (currentView === 'error-codes') {
+      return <span className="font-semibold text-slate-800">Error Codes Directory</span>;
+    }
+    if (currentView === 'tickets') {
+      return <span className="font-semibold text-slate-800">Support Tickets (SQL DB)</span>;
+    }
+    if (currentView === 'health') {
+      return <span className="font-semibold text-slate-800">System Health Diagnostics</span>;
+    }
+    if (currentView === '404') {
+      return <span className="font-semibold text-amber-700">Error 404: Page Not Found</span>;
+    }
+    if (currentView === '500') {
+      return <span className="font-semibold text-red-700">Error 500: Server Error</span>;
+    }
     return (
       <div className="flex items-center gap-2 text-slate-800 font-semibold">
         <FolderKanban className="w-5 h-5 text-brand-600 hidden sm:inline" />
@@ -136,7 +154,7 @@ export function Header({
         {/* Auth prompt if not signed in */}
         {!user && (
           <button
-            onClick={onOpenAuth}
+            onClick={() => onOpenAuth && onOpenAuth('login')}
             className="px-3 py-1.5 text-xs font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
           >
             Sign In
@@ -146,4 +164,3 @@ export function Header({
     </header>
   );
 }
-

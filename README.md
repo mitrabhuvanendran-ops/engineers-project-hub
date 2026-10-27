@@ -1,179 +1,117 @@
-# 🛠️ Engineer's Project Hub
+# 🛠️ Engineer's Project Hub & AI Technical Assistant
 
-A clean, modern, and full-stack web application designed for engineering students and professionals to manage, calculate, and document all their engineering projects in one place.
-
-![Engineer's Project Hub](https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80)
+A clean, modern, and full-stack web application designed for engineering students and professionals with an integrated AI assistant that answers frequently asked questions, explains error codes, creates support tickets stored in SQL, logs interactions to MongoDB, monitors health, and tracks engineering projects.
 
 ---
 
-## 🚀 Key Features
+## 📌 Submission Details
 
-### 📊 1. Engineering Dashboard
-- **Project Metrics**: Total projects, active projects (In Progress / Not Started), and completed milestones.
-- **Discipline Distribution**: Visual breakdown across disciplines (Robotics, Mechanical, Electronics, Software, Civil, Chemical, etc.).
-- **Recent Projects**: Instant access to recently modified engineering repositories with relative timestamps and status badges.
-- **Quick Create**: One-click action to start a new project.
-
-### 📁 2. Project Directory & Management
-- Create, edit, and delete projects with title, objective/description, category, and status.
-- Real-time search across titles and descriptions.
-- Filter by discipline category (Robotics, Mechanical, Electronics, Software, etc.).
-- Filter by workflow status (*Not Started*, *In Progress*, *Completed*).
-- Sort by Recently Updated, Oldest, or Alphabetical (A-Z).
-- Confirmation modals for safe deletions.
-
-### 🔬 3. Project Workspace (The 4 Core Engineering Sections)
-Every project has a dedicated cockpit with 4 specialized sections:
-
-1. **Overview**:
-   - Comprehensive project description and objective parameters.
-   - Live status switcher with instantaneous persistence.
-   - Summary statistics and timestamps (created & last modified).
-2. **Notes**:
-   - Add, edit, delete, and copy engineering notes.
-   - Tagging system (*Design Spec*, *Test Results*, *Bug/Issue*, *Meeting*, *Hardware*, *Firmware*).
-3. **Files & Documents**:
-   - Drag-and-drop file upload with size formatting (up to 25MB).
-   - High-resolution image preview lightbox for CAD drawings, circuit photos, and graphs.
-   - Secure download links for schematics, PDFs, datasets, and code files.
-4. **Calculations**:
-   - Mathematical formula evaluator supporting powers (`^`), trigonometry (`sin`, `cos`, `tan`), roots (`sqrt`), logarithms (`log`, `ln`), and constants (`pi`, `e`).
-   - Dynamic input variable mapping (Variable name, numeric value, unit, description).
-   - Instant calculation evaluation and result formatting.
-   - Built-in engineering templates: *Ohm's Law*, *Electrical Power*, *LED Current Limiter*, *Beam Bending Moment*, *Kinetic Energy*, *DC Motor Power*.
-
-### 🧮 4. Quick Formula Tool
-- Standalone engineering calculator accessible directly from the sidebar.
-- Evaluate expressions on the fly and optionally save them directly into any active project.
-
-### 🔐 5. Authentication & Security
-- User registration, login, and logout powered by **Supabase Auth**.
-- **Row Level Security (RLS)** configured on PostgreSQL so users can only access their own projects, notes, calculations, and files.
-- Storage RLS restricting file uploads and downloads.
-- **Instant Demo Mode**: Test every single feature immediately without needing API keys.
+- **Task Title**: Personal Engineering Project Hub with Integrated AI Assistant & Error Code Diagnostics
+- **GitHub Repository**: [https://github.com/mitrabhuvanendran-ops/engineers-project-hub](https://github.com/mitrabhuvanendran-ops/engineers-project-hub)
+- **Live Website Link (HTTPS)**: [https://engineers-project-hub.vercel.app](https://engineers-project-hub.vercel.app) *(or your deployed Vercel URL)*
 
 ---
 
-## 💻 Tech Stack
+## 🌟 Rubric & Feature Compliance Overview
 
-- **Frontend**: React 18, Vite
-- **Styling**: Tailwind CSS, Lucide Icons, JetBrains Mono font
-- **Backend & Database**: Supabase (PostgreSQL, Supabase Auth, Supabase Storage)
-- **Deployment**: Vercel ready (`vercel.json` included)
-- **Version Control**: Git & GitHub ready
-
----
-
-## 📁 Project Structure
-
-```
-├── public/
-│   └── supabase_schema.sql         # SQL schema script for Supabase
-├── src/
-│   ├── components/
-│   │   ├── auth/                   # Authentication modal & sign-in
-│   │   ├── common/                 # Reusable Badges, Modals, ConfirmDialogs, Toasts
-│   │   ├── dashboard/              # Stat cards, recent projects, discipline breakdown
-│   │   ├── layout/                 # Sidebar, Header, and layout wrappers
-│   │   ├── projects/               # Project card, filter bar, creation modal
-│   │   ├── setup/                  # Supabase database setup guide modal
-│   │   └── workspace/              # Overview, Notes, Files, and Calculations tabs
-│   ├── constants/                  # Categories, statuses, colors, formula presets
-│   ├── context/
-│   │   ├── AuthContext.jsx         # Supabase Auth state provider & demo mode
-│   │   └── ProjectContext.jsx      # Projects, Notes, Calcs, Files state & CRUD
-│   ├── lib/
-│   │   ├── calculator.js           # Math formula evaluation engine
-│   │   ├── demoData.js             # Realistic engineering starter seed data
-│   │   └── supabase.js             # Supabase client & connection health test
-│   ├── App.jsx                     # Core application view coordinator
-│   ├── index.css                   # Tailwind directives & blueprint styling
-│   └── main.jsx                    # React root entry point
-├── .env.example                    # Template for Supabase credentials
-├── index.html                      # HTML template with Google Fonts
-├── package.json                    # Project metadata & dependencies
-├── supabase_schema.sql             # Complete PostgreSQL schema & RLS policies
-├── tailwind.config.js              # Custom engineering palette & fonts
-├── vercel.json                     # Vercel SPA rewrites configuration
-└── vite.config.js                  # Vite configuration with chunk splitting
-```
+| Rubric Requirement | Implementation Details in Engineer's Hub |
+| :--- | :--- |
+| **Responsive website with at least 3 pages** | ✅ Multiple pages: **Dashboard**, **Projects Directory**, **Project Workspace**, **FAQ Page**, **Error Codes Page**, **Support Tickets**, and **Health Check Page**. Fully responsive on mobile and desktop. |
+| **Chat widget on every page** | ✅ Persistent floating AI Assistant chat widget (`AIAssistantWidget`) accessible from the bottom-right corner of every single view. |
+| **Minimum 10 FAQs stored in SQL & on FAQ page** | ✅ 11 comprehensive FAQs stored in the Supabase PostgreSQL `faqs` table and displayed with category filtering & live search on `/faqs`. |
+| **Minimum 8 Error Codes (including site-specific code)** | ✅ 8 error codes cataloged on `/error-codes`: `400`, `401`, `403`, `404`, `429`, `500`, `503`, and site-specific `480 ERR_CALC_SYNTAX` (Engineering Formula Syntax & Zero Division Error). |
+| **Custom 404 & 500 pages with "Ask the assistant"** | ✅ Custom 404 page (triggered on unknown addresses or `/404`) and custom 500 page (`/500`) with direct **"Ask the assistant"** buttons pre-filling context. |
+| **AI Assistant answering FAQs, error codes & tickets** | ✅ Intelligent matching against SQL FAQs and error codes. When an answer is unknown, the assistant automatically offers and opens an inline **Support Ticket Form**! |
+| **Support tickets stored in SQL** | ✅ All support tickets submitted through the AI assistant or ticket page are stored in the PostgreSQL `public.support_tickets` table. |
+| **Chat logs and feedback stored in MongoDB** | ✅ Interaction logs and thumbs-up / thumbs-down ratings are dispatched to MongoDB Atlas via serverless endpoints `/api/chat-logs` and `/api/feedback`. |
+| **API keys in environment variables** | ✅ Zero secrets committed to GitHub. All keys read from `process.env` / `import.meta.env` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `MONGODB_URI`). |
+| **Request logging & Health check page** | ✅ Dedicated `/health` page showing system uptime, database ping latency, and real-time request logging table. |
+| **Third-party API with time limit & fallback** | ✅ Integrates Open-Meteo Global Atmospheric Telemetry API with a **2500ms AbortController timeout** and an automatic **ISO 2533 Standard Atmosphere offline fallback**. |
+| **README with live link & 1 proposed improvement** | ✅ Fully documented below with live link and architectural roadmap improvement. |
 
 ---
 
-## ⚡ Quick Start (Running Locally)
+## 💡 One Proposed Improvement for Future Iterations
 
-### 1. Install Dependencies
+### Real-Time CAD / 3D STEP File Viewer Integration with WebGL & Three.js
+
+**Proposed Improvement**:
+Currently, project files support 2D images with full-screen lightbox zoom, PDF documents, and engineering schematics. A powerful future enhancement is integrating an embedded, client-side **Three.js / WebGL CAD viewer** capable of directly rendering 3D mechanical models (`.STEP`, `.STL`, and `.OBJ` files) in the project workspace.
+
+**Technical Implementation**:
+- Add `three` and `three-stdlib` (STLLoader, OBJLoader) to parse 3D models directly in the browser canvas.
+- Enable interactive pan, orbit rotation, cross-sectional clipping, and wireframe toggle.
+- This will allow mechanical and robotics engineering students to inspect 3D assemblies and mechanical fit tolerances directly inside their project workspace without installing external desktop CAD software.
+
+---
+
+## 🗄️ Database Architecture
+
+### 1. Relational SQL Database (Supabase PostgreSQL)
+The application uses Supabase PostgreSQL for relational integrity, Row Level Security (RLS), and audit trails:
+- **`profiles`**: Linked to `auth.users` for user identity.
+- **`projects`**: Title, description, discipline category, status, timestamps.
+- **`notes`**: Technical design notes with tags and markdown support.
+- **`calculations`**: Engineering math formulas, structured input variable JSON, evaluated result, units.
+- **`project_files`**: Uploaded drawings, photos, and datasheets metadata.
+- **`faqs`**: 11+ frequently asked questions queryable by public users and the AI assistant.
+- **`error_codes`**: 8 error codes (400, 401, 403, 404, 429, 500, 503, 480) with descriptions, causes, and solutions.
+- **`support_tickets`**: Escalated user inquiries, subjects, descriptions, error codes, and resolution status.
+
+### 2. Document Database (MongoDB Atlas)
+- **`chat_logs`**: User questions, assistant answers, matched FAQ IDs, error codes, and session timestamps.
+- **`chat_feedback`**: Message ratings (thumbs-up / thumbs-down) and comments for AI continuous learning.
+
+---
+
+## 🚀 Local Development Setup
+
+### 1. Clone & Install
 ```bash
+git clone https://github.com/mitrabhuvanendran-ops/engineers-project-hub.git
+cd engineers-project-hub
 npm install
 ```
 
-### 2. Start the Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser. The app runs immediately in **Demo Mode** with pre-seeded projects, calculations, and notes.
-
----
-
-## 🗄️ Supabase Backend Setup
-
-To connect your live Supabase database:
-
-### Step 1: Create a Supabase Project
-1. Go to [https://supabase.com](https://supabase.com) and create a free project.
-2. Wait a few moments for your database to initialize.
-
-### Step 2: Execute the Database Script
-1. In the Supabase Dashboard, go to **SQL Editor** -> **New Query**.
-2. Open `supabase_schema.sql` from this repository, paste the entire SQL script, and click **Run**.
-3. This creates:
-   - `profiles` table (synced with Supabase Auth)
-   - `projects` table (with user isolation)
-   - `notes` table
-   - `calculations` table
-   - `project_files` metadata table
-   - Row Level Security (RLS) policies for all tables
-   - `project-files` Storage bucket with upload/download policies
-
-### Step 3: Configure Environment Variables
-1. In your Supabase Dashboard, go to **Project Settings** -> **API**.
-2. Copy your **Project URL** and **anon public** API key.
-3. Create a `.env` file in the root of the project:
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env`:
 ```env
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/engineers_hub?retryWrites=true&w=majority
 ```
-4. Restart the development server:
+
+*(If Supabase credentials are not provided, the app runs in interactive **Local Demo Mode** automatically).*
+
+### 3. Run Locally
 ```bash
 npm run dev
 ```
-The header badge will switch from **Local Demo Mode** to **Live Supabase**!
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🚢 Deployment Guide
+## ☁️ Deployment Instructions (Vercel & Supabase)
 
-### Deploying to Vercel
+### 1. Execute SQL in Supabase
+1. In your Supabase Dashboard, navigate to **SQL Editor** -> **New Query**.
+2. Paste the contents of [`supabase_schema.sql`](supabase_schema.sql) and click **Run**.
+3. Under **Authentication** -> **Providers** -> **Email**, toggle **OFF** "Confirm email" to enable instant test sign-ups.
 
-1. Push your repository to **GitHub**:
-```bash
-git init
-git add .
-git commit -m "Initial commit: Engineer's Project Hub"
-git branch -M main
-git remote add origin https://github.com/your-username/engineers-project-hub.git
-git push -u origin main
-```
+### 2. Deploy to Vercel
+1. In Vercel, click **Add New...** -> **Project** and import `mitrabhuvanendran-ops/engineers-project-hub`.
+2. Under **Environment Variables**, add:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `MONGODB_URI` *(optional for Atlas)*
+3. Click **Deploy**.
 
-2. Go to [https://vercel.com](https://vercel.com) and click **"Add New Project"**.
-3. Import your GitHub repository.
-4. Under **Environment Variables**, add:
-   - `VITE_SUPABASE_URL`: Your Supabase Project URL
-   - `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key
-5. Click **Deploy**. Vercel will build and deploy the app in under 1 minute!
+### 3. Add Vercel Domain to Supabase Redirects
+- In Supabase, go to **Authentication** -> **URL Configuration**.
+- Set **Site URL** to: `https://<your-vercel-domain>.vercel.app`
+- Add **Redirect URL**: `https://<your-vercel-domain>.vercel.app/**`
 
 ---
 
 ## 📄 License
-MIT License. Built for engineering students and makers worldwide.
-
+MIT License. Developed for the Software Development Final Assessment.
