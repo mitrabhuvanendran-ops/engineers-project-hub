@@ -31,3 +31,4 @@ dist-ssr
 .venv
 myproject
 db.sqlite3
+

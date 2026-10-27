@@ -198,6 +198,11 @@ export function ProjectProvider({ children }) {
   // =========================================================================
 
   const createProject = async ({ title, description, category, status }) => {
+    if (!user) {
+      showToast('Please sign in or register to create projects', 'error');
+      return { success: false, error: 'Authentication required' };
+    }
+
     if (!title || !title.trim()) {
       showToast('Project title is required', 'error');
       return { success: false, error: 'Title required' };
@@ -355,6 +360,11 @@ export function ProjectProvider({ children }) {
   // =========================================================================
 
   const createNote = async ({ projectId, title, content, tag }) => {
+    if (!user) {
+      showToast('Please sign in to save notes', 'error');
+      return { success: false, error: 'Authentication required' };
+    }
+
     if (!title || !title.trim()) {
       showToast('Note title is required', 'error');
       return { success: false };
@@ -506,6 +516,11 @@ export function ProjectProvider({ children }) {
   // =========================================================================
 
   const createCalculation = async ({ projectId, title, formula, inputs, result, unit, notes }) => {
+    if (!user) {
+      showToast('Please sign in to save calculations', 'error');
+      return { success: false, error: 'Authentication required' };
+    }
+
     if (!title || !title.trim()) {
       showToast('Calculation title is required', 'error');
       return { success: false };
@@ -671,6 +686,10 @@ export function ProjectProvider({ children }) {
   // =========================================================================
 
   const uploadFile = async (projectId, file) => {
+    if (!user) {
+      showToast('Please sign in to upload files', 'error');
+      return { success: false, error: 'Authentication required' };
+    }
     if (!file) return { success: false, error: 'No file provided' };
     const pId = projectId || activeProjectId;
     if (!pId) return { success: false, error: 'No active project' };
@@ -838,3 +857,4 @@ export function useProjects() {
   }
   return context;
 }
+

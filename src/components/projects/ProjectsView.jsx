@@ -142,3 +142,4 @@ export function ProjectsView({ onOpenProject, onOpenNewProject }) {
     </div>
   );
 }
+

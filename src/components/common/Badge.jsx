@@ -26,3 +26,4 @@ export function StatusBadge({ status, className = '' }) {
     </span>
   );
 }
+

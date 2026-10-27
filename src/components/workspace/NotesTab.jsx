@@ -251,3 +251,4 @@ export function NotesTab({ notes, projectId }) {
     </div>
   );
 }
+

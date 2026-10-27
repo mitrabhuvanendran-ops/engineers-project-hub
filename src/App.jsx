@@ -28,7 +28,13 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login');
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
+
+  const handleOpenAuth = (mode = 'login') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   // Navigate to project workspace
   const handleOpenProject = (projectId) => {
@@ -72,8 +78,14 @@ export function App() {
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
-        onOpenNewProject={() => setIsNewProjectModalOpen(true)}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenNewProject={() => {
+          if (!user && isSupabaseConfigured) {
+            handleOpenAuth('register');
+          } else {
+            setIsNewProjectModalOpen(true);
+          }
+        }}
+        onOpenAuth={handleOpenAuth}
         onOpenSetup={() => setIsSetupModalOpen(true)}
         isOpen={sidebarOpen}
         setIsOpen={setSidebarOpen}
@@ -85,9 +97,15 @@ export function App() {
         <Header
           currentView={currentView}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          onOpenNewProject={() => setIsNewProjectModalOpen(true)}
+          onOpenNewProject={() => {
+            if (!user && isSupabaseConfigured) {
+              handleOpenAuth('register');
+            } else {
+              setIsNewProjectModalOpen(true);
+            }
+          }}
           onOpenSetup={() => setIsSetupModalOpen(true)}
-          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenAuth={handleOpenAuth}
         />
 
         {/* Content Body */}
@@ -101,16 +119,29 @@ export function App() {
             <>
               {currentView === 'dashboard' && (
                 <DashboardView
-                  onOpenNewProject={() => setIsNewProjectModalOpen(true)}
+                  onOpenNewProject={() => {
+                    if (!user && isSupabaseConfigured) {
+                      handleOpenAuth('register');
+                    } else {
+                      setIsNewProjectModalOpen(true);
+                    }
+                  }}
                   onOpenProject={handleOpenProject}
                   setCurrentView={setCurrentView}
+                  onOpenAuth={handleOpenAuth}
                 />
               )}
 
               {currentView === 'projects' && (
                 <ProjectsView
                   onOpenProject={handleOpenProject}
-                  onOpenNewProject={() => setIsNewProjectModalOpen(true)}
+                  onOpenNewProject={() => {
+                    if (!user && isSupabaseConfigured) {
+                      handleOpenAuth('register');
+                    } else {
+                      setIsNewProjectModalOpen(true);
+                    }
+                  }}
                 />
               )}
 
@@ -158,6 +189,7 @@ export function App() {
         <AuthModal
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
+          initialMode={authModalMode}
         />
       )}
 
@@ -173,3 +205,4 @@ export function App() {
 }
 
 export default App;
+

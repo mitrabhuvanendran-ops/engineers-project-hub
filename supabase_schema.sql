@@ -248,3 +248,4 @@ CREATE POLICY "Users can view/download files in project-files"
 CREATE POLICY "Users can delete their files in project-files"
   ON storage.objects FOR DELETE
   USING (bucket_id = 'project-files' AND auth.role() = 'authenticated');
+

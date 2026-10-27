@@ -47,3 +47,4 @@ export function Toast({ toast, onClose }) {
     </div>
   );
 }
+

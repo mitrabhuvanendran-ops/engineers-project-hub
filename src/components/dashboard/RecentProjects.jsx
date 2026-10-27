@@ -85,3 +85,4 @@ export function RecentProjects({ onOpenProject, onOpenNewProject }) {
     </div>
   );
 }
+

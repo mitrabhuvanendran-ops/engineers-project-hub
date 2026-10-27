@@ -232,3 +232,4 @@ export function Sidebar({ currentView, setCurrentView, onOpenNewProject, onOpenA
     </>
   );
 }
+

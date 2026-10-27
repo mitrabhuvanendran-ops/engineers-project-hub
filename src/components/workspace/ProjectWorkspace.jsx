@@ -277,3 +277,4 @@ export function ProjectWorkspace({ onBack }) {
     </div>
   );
 }
+

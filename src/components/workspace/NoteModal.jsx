@@ -136,3 +136,4 @@ export function NoteModal({
     </Modal>
   );
 }
+

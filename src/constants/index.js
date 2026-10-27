@@ -159,3 +159,4 @@ export const CALCULATION_TEMPLATES = [
     notes: "Shaft mechanical power calculation."
   }
 ];
+

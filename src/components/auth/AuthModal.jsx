@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { Cpu, Lock, Mail, User, Sparkles, AlertCircle } from 'lucide-react';
 
-export function AuthModal({ isOpen, onClose }) {
+export function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const { signIn, signUp, loginAsDemo, isSupabaseConfigured, authError, setAuthError } = useAuth();
 
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode || 'login');
+      setLocalError('');
+      setAuthError(null);
+    }
+  }, [isOpen, initialMode, setAuthError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,3 +207,4 @@ export function AuthModal({ isOpen, onClose }) {
     </Modal>
   );
 }
+
