@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Initial Entry & Authentication
-    path('', views.initial_entry, name='initial_entry'),
-    path('login/', views.login_view, name='login'),
+    # Initial First Page: Dedicated Login Screen
+    path('', views.login_view, name='login'),
+    path('login/', views.login_view, name='login_alias'),
     path('demo-login/', views.demo_login_view, name='demo_login'),
     path('logout/', views.logout_view, name='logout'),
 
@@ -35,4 +35,3 @@ urlpatterns = [
     path('api/assistant/', views.assistant_api, name='assistant_api'),
     path('api/feedback/', views.feedback_api, name='feedback_api'),
 ]
-
